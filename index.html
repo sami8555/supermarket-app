@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Supermarket Data Entry App</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 20px; }
+        label, input { display: block; margin-bottom: 10px; }
+        button { padding: 8px 16px; margin-top: 10px; }
+        table { width: 100%; margin-top: 20px; border-collapse: collapse; }
+        th, td { padding: 8px; border: 1px solid #ccc; text-align: left; }
+        .pending { color: red; }
+        .completed { color: green; }
+    </style>
+</head>
+<body>
+    <h1>Supermarket Data Entry</h1>
+    
+    <!-- Data entry fields -->
+    <label>Item Name:</label>
+    <input type="text" id="itemName">
+    
+    <label>MRP Price:</label>
+    <input type="number" id="mrpPrice">
+    
+    <label>Selling Price:</label>
+    <input type="number" id="sellingPrice">
+    
+    <label>Barcode:</label>
+    <input type="text" id="barcode">
+    
+    <button onclick="addItem()">Add Item</button>
+    
+    <!-- Display the table -->
+    <h2>Item List</h2>
+    <table id="itemTable">
+        <thead>
+            <tr>
+                <th>Item Name</th>
+                <th>MRP Price</th>
+                <th>Selling Price</th>
+                <th>Barcode</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+
+    <script>
+        // Load items from Local Storage on page load
+        document.addEventListener('DOMContentLoaded', loadItems);
+
+        function addItem() {
+            // Get values from input fields
+            const itemName = document.getElementById("itemName").value;
+            const mrpPrice = parseFloat(document.getElementById("mrpPrice").value) || 0;
+            const sellingPrice = parseFloat(document.getElementById("sellingPrice").value) || 0;
+            const barcode = document.getElementById("barcode").value;
+            
+            // Determine item status
+            const status = (mrpPrice === 0 || sellingPrice === 0) ? 'pending' : 'completed';
+            
+            // Save item in Local Storage
+            const items = JSON.parse(localStorage.getItem("items")) || [];
+            items.push({ itemName, mrpPrice, sellingPrice, barcode, status });
+            localStorage.setItem("items", JSON.stringify(items));
+            
+            // Add item to the table
+            displayItem({ itemName, mrpPrice, sellingPrice, barcode, status });
+            
+            // Clear input fields
+            document.getElementById("itemName").value = '';
+            document.getElementById("mrpPrice").value = '';
+            document.getElementById("sellingPrice").value = '';
+            document.getElementById("barcode").value = '';
+        }
+
+        function loadItems() {
+            // Load items from Local Storage
+            const items = JSON.parse(localStorage.getItem("items")) || [];
+            items.forEach(item => displayItem(item));
+        }
+
+        function displayItem(item) {
+            // Get the table body element
+            const tableBody = document.getElementById("itemTable").querySelector("tbody");
+
+            // Create a new row and add item data
+            const row = tableBody.insertRow();
+            row.insertCell().textContent = item.itemName;
+            row.insertCell().textContent = item.mrpPrice;
+            row.insertCell().textContent = item.sellingPrice;
+            row.insertCell().textContent = item.barcode;
+
+            // Set status cell text and color
+            const statusCell = row.insertCell();
+            statusCell.textContent = item.status;
+            statusCell.classList.add(item.status === 'pending' ? 'pending' : 'completed');
+        }
+    </script>
+</body>
+</html>
